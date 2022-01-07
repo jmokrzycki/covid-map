@@ -6,7 +6,8 @@ import axios from 'axios';
 import { MapContainer, TileLayer, Marker, Popup } from 'react-leaflet';
 import 'leaflet/dist/leaflet.css';
 
-
+import markerIconPng from "leaflet/dist/images/marker-icon.png";
+import {Icon} from 'leaflet';
 
 const position = [51.505, -0.09];
 
@@ -35,11 +36,17 @@ function App() {
           url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
         />
         {
-         countries.length && countries.map(({countryInfo}, index) => {
+         countries.length && countries.map((country, index) => {
             return (
-              <Marker key={index} position={[countryInfo.lat, countryInfo.long]}>
+              <Marker
+               key={index} 
+               position={[country.countryInfo.lat, country.countryInfo.long]}
+               icon={new Icon({iconUrl: markerIconPng, iconSize: [25, 41], iconAnchor: [12, 41]})}
+               >
                 <Popup>
-                  A pretty CSS3 popup. <br /> Easily customizable.
+                <p>Today cases: {country.todayCases}</p>
+                <p>Today deaths: {country.todayDeaths}</p>
+                <p>Today recovered: {country.todayRecovered}</p>
                 </Popup>
               </Marker>
             )
