@@ -13,21 +13,28 @@ const position = [51.505, -0.09];
 
 function App() {
   const [countries, setCountries] = useState([]);
+  const [world, setWorld] = useState([]);
 
   useEffect(()=>{
-    console.log(countries)
+    console.log(world)
   })
 
   useEffect(() => {
     axios.get('https://disease.sh/v3/covid-19/countries')
     .then((response) => {
       setCountries(Object.values(response.data));  
+    });
+
+    axios.get('https://disease.sh/v3/covid-19/all')
+    .then((response) => {
+      setWorld(response.data);  
     })
   }, []);
 
   return (
+    <>
       <MapContainer 
-      style={{ width: '100vw', height: '100vh' }}
+      style={{ width: '100vw', height: '80vh' }}
       center={position}
       zoom={3}
       scrollWheelZoom={false}>
@@ -53,6 +60,12 @@ function App() {
           })
         }
     </MapContainer>
+        <div style={{ width: '100vw', height: '20vh' }}>
+          <p>World cases: {world.cases}</p>
+          <p>World deaths: {world.deaths}</p>
+          <p>World recovered: {world.recovered}</p>
+        </div>
+    </>
   );
 }
  
