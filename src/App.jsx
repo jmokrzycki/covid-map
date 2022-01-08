@@ -9,15 +9,44 @@ import 'leaflet/dist/leaflet.css';
 import markerIconPng from "leaflet/dist/images/marker-icon.png";
 import {Icon} from 'leaflet';
 
+import { Chart as ChartJS, CategoryScale, LineController, LineElement, PointElement, LinearScale, Title } from 'chart.js';
+
+import { Chart, Line } from 'react-chartjs-2';
+
+ChartJS.register(CategoryScale, LineController, LineElement, PointElement, LinearScale, Title);
+
 const position = [51.505, -0.09];
 
 function App() {
   const [countries, setCountries] = useState([]);
   const [world, setWorld] = useState([]);
+  const [historicalWorld, setHistoricalWorld] = useState([]);
+  const [chartData, setChartData] = useState([]);
 
-  useEffect(()=>{
-    console.log(world)
-  })
+  const data = {
+    labels: chartData.dates,
+    datasets: [
+      {
+        label: "Cases",
+        data: chartData.cases,
+        fill: true,
+        backgroundColor: "rgba(75,192,192,0.2)",
+        borderColor: "rgba(75,192,192,1)"
+      },
+      {
+        label: "Deaths",
+        data: chartData.deaths,
+        fill: false,
+        borderColor: "#742774"
+      },
+      {
+        label: "Recovered",
+        data: chartData.recovered,
+        fill: false,
+        borderColor: "red"
+      }
+    ]
+  };
 
   useEffect(() => {
     axios.get('https://disease.sh/v3/covid-19/countries')
@@ -29,6 +58,21 @@ function App() {
     .then((response) => {
       setWorld(response.data);  
     })
+
+    axios.get('https://disease.sh/v3/covid-19/historical/all?lastdays=200')
+    .then((response) => {
+      
+      console.log(response);
+
+      setChartData({
+        dates: Object.keys(response.data.cases),
+        cases: Object.values(response.data.cases),
+        deaths: Object.values(response.data.deaths),
+        recovered: Object.values(response.data.recovered),
+      });  
+    })
+
+    
   }, []);
 
   return (
@@ -65,6 +109,9 @@ function App() {
           <p>World deaths: {world.deaths}</p>
           <p>World recovered: {world.recovered}</p>
         </div>
+
+        <Line data={data} />
+
     </>
   );
 }
